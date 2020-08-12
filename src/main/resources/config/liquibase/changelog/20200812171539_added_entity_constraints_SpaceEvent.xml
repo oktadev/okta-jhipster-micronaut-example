@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.9.xsd">
+    <!--
+        Added the constraints for entity SpaceEvent.
+    -->
+    <changeSet id="20200812171539-2" author="jhipster">
+        
+        <addForeignKeyConstraint baseColumnNames="mission_id"
+                                 baseTableName="space_event"
+                                 constraintName="fk_space_event_mission_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="mission"/>
+
+    </changeSet>
+</databaseChangeLog>

@@ -1,0 +1,57 @@
+<div class="row justify-content-center">
+    <div class="col-8">
+        <div *ngIf="spaceEvent">
+            <h2><span jhiTranslate="spaceApp.spaceEvent.detail.title">Space Event</span> {{ spaceEvent.id }}</h2>
+
+            <hr>
+
+            <jhi-alert-error></jhi-alert-error>
+
+            <dl class="row-md jh-entity-details">
+                <dt><span jhiTranslate="spaceApp.spaceEvent.name">Name</span></dt>
+                <dd>
+                    <span>{{ spaceEvent.name }}</span>
+                </dd>
+                <dt><span jhiTranslate="spaceApp.spaceEvent.date">Date</span></dt>
+                <dd>
+                    <span>{{ spaceEvent.date }}</span>
+                </dd>
+                <dt><span jhiTranslate="spaceApp.spaceEvent.description">Description</span></dt>
+                <dd>
+                    <span>{{ spaceEvent.description }}</span>
+                </dd>
+                <dt><span jhiTranslate="spaceApp.spaceEvent.photo">Photo</span></dt>
+                <dd>
+                    <div *ngIf="spaceEvent.photo">
+                        <a (click)="openFile(spaceEvent.photoContentType, spaceEvent.photo)">
+                            <img [src]="'data:' + spaceEvent.photoContentType + ';base64,' + spaceEvent.photo" style="max-width: 100%;" alt="spaceEvent image"/>
+                        </a>
+                        {{ spaceEvent.photoContentType }}, {{ byteSize(spaceEvent.photo) }}
+                    </div>
+                </dd>
+                <dt><span jhiTranslate="spaceApp.spaceEvent.type">Type</span></dt>
+                <dd>
+                    <span jhiTranslate="{{ 'spaceApp.SpaceEventType.' + spaceEvent.type }}">{{ spaceEvent.type }}</span>
+                </dd>
+                <dt><span jhiTranslate="spaceApp.spaceEvent.mission">Mission</span></dt>
+                <dd>
+                    <div *ngIf="spaceEvent.mission">
+                        <a [routerLink]="['/mission', spaceEvent.mission?.id, 'view']">{{ spaceEvent.mission?.name }}</a>
+                    </div>
+                </dd>
+            </dl>
+
+            <button type="submit"
+                    (click)="previousState()"
+                    class="btn btn-info">
+                <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="entity.action.back">Back</span>
+            </button>
+
+            <button type="button"
+                    [routerLink]="['/space-event', spaceEvent.id, 'edit']"
+                    class="btn btn-primary">
+                <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span jhiTranslate="entity.action.edit">Edit</span>
+            </button>
+        </div>
+    </div>
+</div>

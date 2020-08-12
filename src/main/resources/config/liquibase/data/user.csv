@@ -1,0 +1,5 @@
+id;login;first_name;last_name;email;image_url;activated;lang_key
+1;system;System;System;system@localhost;;true;en
+2;anonymoususer;Anonymous;User;anonymous@localhost;;true;en
+3;admin;Administrator;Administrator;admin@localhost;;true;en
+4;user;User;User;user@localhost;;true;en

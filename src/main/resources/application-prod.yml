@@ -1,0 +1,148 @@
+# ===================================================================
+# Micronaut configuration for the "prod" environment.
+#
+# This configuration overrides the application.yml file.
+#
+# Full Micronaut configuration reference is available at:
+# https://docs.micronaut.io/latest/guide/configurationreference.html
+#
+# More information on JHipster configuration properties:
+# https://www.jhipster.tech/common-application-properties/
+# ===================================================================
+logging:
+  level:
+    ROOT: INFO
+    org.jhipster.space: INFO
+    io.github.jhipster: INFO
+
+management:
+  metrics:
+    export:
+      prometheus:
+        enabled: false
+
+datasources:
+  default:
+    type: com.zaxxer.hikari.HikariDataSource
+    url: ${JDBC_URL:`jdbc:postgresql://localhost:5432/space`}
+    username: 'space'
+    password: ''
+    driverClassName: 'org.postgresql.Driver'
+    autoCommit: false
+    hikari:
+      poolName: Hikari
+      maximum-pool-size: 10
+      data-source-properties:
+        cachePrepStmts: true
+        prepStmtCacheSize: 250
+        prepStmtCacheSqlLimit: 2048
+        useServerPrepStmts: true
+---
+jpa:
+  default:
+    packages-to-scan:
+      - org.jhipster.space.domain
+      - org.jhipster.space.repository
+    show-sql: false
+    properties:
+      hibernate.dialect: 'io.github.jhipster.domain.util.FixedPostgreSQL10Dialect'
+      hibernate.javax.cache.missing_cache_strategy: create
+      hibernate.id.new_generator_mappings: true
+      hibernate.connection.provider_disables_autocommit: true
+      hibernate.connection.autocommit: false
+      hibernate.cache.use_second_level_cache: true
+      hibernate.cache.use_query_cache: false
+      hibernate.generate_statistics: false
+
+# Replace by 'prod, faker' to add the faker context and have sample data loaded in production
+liquibase:
+  datasources:
+    default:
+      async: true
+      change-log: classpath:config/liquibase/master.xml
+      contexts: prod,faker
+mail:
+  host: localhost
+  port: 25
+  username:
+  password:
+thymeleaf:
+  cache: true
+
+# ===================================================================
+# To enable TLS in production, generate a certificate using:
+# keytool -genkey -alias space -storetype PKCS12 -keyalg RSA -keysize 2048 -keystore keystore.p12 -validity 3650
+#
+# You can also use Let's Encrypt:
+# https://maximilian-boehm.com/hp2121/Create-a-Java-Keystore-JKS-from-Let-s-Encrypt-Certificates.htm
+#
+# Then, modify the micronaut.server.ssl properties so your "server" configuration looks like:
+#
+# micronaut:
+#   server:
+#     ssl:
+#       port: 443
+#       key-store:
+#         path: classpath:config/tls/keystore.p12
+#         password: password
+#         type: PKCS12
+#       key:
+#         alias: space
+#          # The ciphers suite enforce the security by deactivating some old and deprecated SSL cipher, this list was tested against SSL Labs (https://www.ssllabs.com/ssltest/)
+#       ciphers: TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA,TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA,TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 ,TLS_DHE_RSA_WITH_AES_128_GCM_SHA256 ,TLS_DHE_RSA_WITH_AES_256_GCM_SHA384 ,TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256,TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384,TLS_DHE_RSA_WITH_AES_128_CBC_SHA256,TLS_DHE_RSA_WITH_AES_128_CBC_SHA,TLS_DHE_RSA_WITH_AES_256_CBC_SHA256,TLS_DHE_RSA_WITH_AES_256_CBC_SHA,TLS_RSA_WITH_AES_128_GCM_SHA256,TLS_RSA_WITH_AES_256_GCM_SHA384,TLS_RSA_WITH_AES_128_CBC_SHA256,TLS_RSA_WITH_AES_256_CBC_SHA256,TLS_RSA_WITH_AES_128_CBC_SHA,TLS_RSA_WITH_AES_256_CBC_SHA,TLS_DHE_RSA_WITH_CAMELLIA_256_CBC_SHA,TLS_RSA_WITH_CAMELLIA_256_CBC_SHA,TLS_DHE_RSA_WITH_CAMELLIA_128_CBC_SHA,TLS_RSA_WITH_CAMELLIA_128_CBC_SHA
+# ===================================================================
+micronaut:
+  server:
+    port: 8080
+  security:
+    token:
+      jwt:
+        generator:
+          access-token:
+            expiration: 86400
+        signatures:
+          secret:
+            generator:
+              # As this is the PRODUCTION configuration, you must securely supply the application with a secret.
+              secret: Yjc4ODkwYzQ0ZDBiZmRkNGFkYWIxOGQzOGQ5MDRhNjJhMDY5MTUzNjJkNWI0MGY5ZWU4ZWVlNWZkMDA5ZWI1MjM2NDBlNTA0MjRkYTVlYmIwYjUwMzY3NGYzNDljOTUwNjc4YzYwNThhOTY0OTZiOTk3ODI5ODk2MGQyZmRiYmE=
+              base64: true
+              jws-algorithm: HS512
+
+# ===================================================================
+# JHipster specific properties
+#
+# Full reference is available at: https://www.jhipster.tech/common-application-properties/
+# ===================================================================
+
+jhipster:
+  http:
+    cache: # Used by the CachingHttpHeadersFilter
+      timeToLiveInDays: 1461
+  cache: # Cache configuration
+    ehcache: # Ehcache configuration
+      time-to-live-seconds: 3600 # By default objects stay 1 hour in the cache
+      max-entries: 1000 # Number of objects in each cache entry
+  mail: # specific JHipster mail property, for standard properties see MailProperties
+    from: space@localhost
+    base-url: http://my-server-url-to-change # Modify according to your server's URL
+  metrics:
+    logs: # Reports metrics in the logs
+      enabled: false
+      report-frequency: 60 # in seconds
+  logging:
+    use-json-format: false # By default, logs are not in Json format
+    logstash: # Forward logs to logstash over a socket, used by LoggingConfiguration
+      enabled: false
+      host: localhost
+      port: 5000
+      queue-size: 512
+# ===================================================================
+# Application specific properties
+# Add your own application properties here, see the ApplicationProperties class
+# to have type-safe configuration, like in the JHipsterProperties above
+#
+# More documentation is available at:
+# https://www.jhipster.tech/common-application-properties/
+# ===================================================================
+
+# application:

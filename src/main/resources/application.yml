@@ -1,0 +1,175 @@
+# ===================================================================
+# Micronaut configuration.
+#
+# This configuration will be overridden by the environment you use,
+# for example application-dev.yml if you use the "dev" environment.
+#
+# More information on profiles: https://www.jhipster.tech/profiles/
+# More information on configuration properties: https://www.jhipster.tech/common-application-properties/
+# ===================================================================
+
+# ===================================================================
+# Standard Micronaut configuration properties.
+# Full reference is available at:
+# https://docs.micronaut.io/latest/guide/configurationreference.html
+# ===================================================================
+micronaut:
+  application:
+    name: space
+  router:
+    static-resources:
+      client:
+        paths: classpath:static
+        mapping: /**
+  metrics:
+    export:
+      # Prometheus is the default metrics backend
+      prometheus:
+        enabled: true
+        step: PT1M
+    binders:
+      jvm:
+        enabled: true
+      uptime:
+        enabled: true
+      processor:
+        enabled: true
+      logback:
+        enabled: true
+      web:
+        enabled: true
+  security:
+    enabled: true
+    basic-auth:
+      enabled: false
+    authentication: cookie
+    oauth2:
+      enabled: true
+      clients:
+        oidc:
+          client-secret: web_app
+          client-id: web_app
+          openid:
+            issuer: http://localhost:9080/auth/realms/jhipster
+      login-uri: /oauth2/authorization{/provider}
+      callback-uri: /oauth2/callback{/provider}
+    endpoints:
+      login:
+        enabled: true
+        path: /api/authenticate
+      logout:
+        enabled: true
+        get-allowed: true
+    intercept-url-map:
+      - pattern: /
+        access: isAnonymous()
+      - pattern: /manifest.webapp
+        access: isAnonymous()
+      - pattern: /app/**/*.*
+        access: isAnonymous()
+      - pattern: /i18n/**
+        access: isAnonymous()
+      - pattern: /content/**
+        access: isAnonymous()
+      - pattern: /swagger-ui/index.html
+        access: isAnonymous()
+      - pattern: /favicon.ico
+        access: isAnonymous()
+      - pattern: /test/**
+        access: isAnonymous()
+      - pattern: /api/register
+        access: isAnonymous()
+      - pattern: /api/activate
+        access: isAnonymous()
+      - pattern: /api/account/reset-password/init
+        access: isAnonymous()
+      - pattern: /api/account/reset-password/finish
+        access: isAnonymous()
+      - pattern: /api/**
+        access: isAuthenticated()
+      - pattern: /management/health
+        access: isAnonymous()
+      - pattern: /management/info
+        access: isAnonymous()
+      - pattern: /management/prometheus
+        access: isAnonymous()
+      - pattern: /management/**
+        access: ROLE_ADMIN
+
+  executors:
+    scheduled:
+      type: scheduled
+      core-pool-size: 2
+    io:
+      type: fixed
+      nThreads: 10
+  server:
+    # By default CORS is disabled. Uncomment to enable.
+    # cors:
+    #   enabled: true
+    #   single-header: true
+    #   configurations:
+    #     default:
+    #       allowed-origins: "*"
+    #       allowed-methods: "*"
+    #       allowed-headers: "*"
+    #       exposed-headers: "Authorization,Link,X-Total-Count"
+    #       allow-credentials: true
+    #       max-age: 1800
+endpoints:
+  all:
+    path: /management
+    sensitive: false
+  health:
+    details-visible: AUTHENTICATED
+    discovery-client:
+      enabled: false
+jmx:
+  register-endpoints: false
+
+jpa:
+  default:
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+        ddl-auto: none
+        physical_naming_strategy: org.jhipster.space.config.SnakeCasePhysicalNamingStrategy
+
+# Properties to be exposed on the /info management endpoint
+info:
+  # Comma separated list of profiles that will trigger the ribbon to show
+  display-ribbon-on-profiles: 'dev'
+
+# ===================================================================
+# JHipster specific properties
+#
+# Full reference is available at: https://www.jhipster.tech/common-application-properties/
+# ===================================================================
+
+jhipster:
+  clientApp:
+    name: 'spaceApp'
+  mail:
+    from: space@localhost
+  swagger:
+    default-include-pattern: /api/.*
+    title: space API
+    description: space API documentation
+    version: 0.0.1
+    terms-of-service-url:
+    contact-name:
+    contact-url:
+    contact-email:
+    license:
+    license-url:
+# ===================================================================
+# Application specific properties
+# Add your own application properties here, see the ApplicationProperties class
+# to have type-safe configuration, like in the JHipsterProperties above
+#
+# More documentation is available at:
+# https://www.jhipster.tech/common-application-properties/
+# ===================================================================
+
+# application:

@@ -1,0 +1,23 @@
+{
+  "spaceApp": {
+    "mission": {
+      "home": {
+        "title": "Missions",
+        "createLabel": "Create a new Mission",
+        "createOrEditLabel": "Create or edit a Mission",
+        "notFound": "No Missions found"
+      },
+      "created": "A new Mission is created with identifier {{ param }}",
+      "updated": "A Mission is updated with identifier {{ param }}",
+      "deleted": "A Mission is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete Mission {{ id }}?"
+      },
+      "detail": {
+        "title": "Mission"
+      },
+      "name": "Name",
+      "description": "Description"
+    }
+  }
+}

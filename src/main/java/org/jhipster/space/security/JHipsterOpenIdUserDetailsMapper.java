@@ -1,0 +1,145 @@
+package org.jhipster.space.security;
+
+import org.jhipster.space.domain.Authority;
+import org.jhipster.space.domain.User;
+import org.jhipster.space.service.UserService;
+
+import com.nimbusds.jwt.JWT;
+import com.nimbusds.jwt.JWTClaimsSet;
+import com.nimbusds.jwt.JWTParser;
+import io.micronaut.context.annotation.Requires;
+import io.micronaut.security.authentication.UserDetails;
+import io.micronaut.security.config.AuthenticationModeConfiguration;
+import io.micronaut.security.oauth2.configuration.OpenIdAdditionalClaimsConfiguration;
+import io.micronaut.security.oauth2.endpoint.token.response.DefaultOpenIdUserDetailsMapper;
+import io.micronaut.security.oauth2.endpoint.token.response.OpenIdClaims;
+import io.micronaut.security.oauth2.endpoint.token.response.OpenIdTokenResponse;
+import io.micronaut.security.oauth2.endpoint.token.response.OpenIdUserDetailsMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import javax.inject.Named;
+import javax.inject.Singleton;
+import java.text.ParseException;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Collection;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+@Singleton
+@Requires(classes = JWTParser.class)
+@Named("oidc")
+public class JHipsterOpenIdUserDetailsMapper extends DefaultOpenIdUserDetailsMapper {
+    private static final Logger LOG = LoggerFactory.getLogger(JHipsterOpenIdUserDetailsMapper.class);
+    public static final String GROUPS_CLAIM = "groups";
+    public static final String ROLES_CLAIM = "roles";
+    public static final String ROLE_PREFIX = "ROLE_";
+
+    private UserService userService;
+
+    /**
+    * Default constructor.
+    *
+    * @param openIdAdditionalClaimsConfiguration The additional claims configuration
+    */
+    public JHipsterOpenIdUserDetailsMapper(OpenIdAdditionalClaimsConfiguration openIdAdditionalClaimsConfiguration,
+                                            AuthenticationModeConfiguration authenticationModeConfiguration,
+                                            UserService userService) {
+        super(openIdAdditionalClaimsConfiguration, authenticationModeConfiguration);
+        this.userService = userService;
+    }
+
+    private void syncWithIdp(JWT parsedJwt, List<String> roles) {
+        
+        try {
+            User user = new User();
+            user.setId(parsedJwt.getJWTClaimsSet().getSubject());
+            user.setLogin(parsedJwt.getJWTClaimsSet().getStringClaim("preferred_username"));
+            user.setEmail(parsedJwt.getJWTClaimsSet().getStringClaim("email"));
+            user.setFirstName(parsedJwt.getJWTClaimsSet().getStringClaim("given_name"));
+            user.setLastName(parsedJwt.getJWTClaimsSet().getStringClaim("family_name"));
+
+            user.setAuthorities(roles.stream().map(it -> {
+                Authority authority = new Authority();
+                authority.setName(it);
+                return authority;
+            }).collect(Collectors.toSet()));
+
+            userService.syncUserWithIdP(user);
+        } catch (Exception e) {
+            throw new RuntimeException("Unable to sync user with idp.", e);
+        }
+    }
+
+    /**
+    * @param providerName The OpenID provider name
+    * @param tokenResponse The token response
+    * @param openIdClaims The OpenID claims
+    * @return The roles to set in the {@link UserDetails}
+    */
+    @Override
+    protected List<String> getRoles(String providerName, OpenIdTokenResponse tokenResponse, OpenIdClaims openIdClaims) {
+        JWT parsedJwt = null;
+        List<String> roles = new ArrayList<>();
+        try {
+            parsedJwt = JWTParser.parse(tokenResponse.getAccessToken());
+            roles.addAll(extractAuthorityFromClaims(parsedJwt.getJWTClaimsSet()));
+        } catch (Exception e) {
+            LOG.error("JWT Parse exception processing access token: {}", tokenResponse.getAccessToken());
+        }
+
+        try {
+            parsedJwt = JWTParser.parse(tokenResponse.getIdToken());
+            roles.addAll(extractAuthorityFromClaims(parsedJwt.getJWTClaimsSet()));
+        } catch (Exception e) {
+            LOG.error("JWT Parse exception processing id token: {}", tokenResponse.getIdToken());
+        }
+
+        if (parsedJwt != null) {
+            syncWithIdp(parsedJwt, roles);
+        }
+
+        return roles;
+    }
+
+    @Override
+    protected Map<String, Object> buildAttributes(String providerName, OpenIdTokenResponse tokenResponse, OpenIdClaims openIdClaims) {
+        Map<String, Object> claims = super.buildAttributes(providerName, tokenResponse, openIdClaims);
+
+        claims.put(OpenIdUserDetailsMapper.OPENID_TOKEN_KEY, tokenResponse.getIdToken());
+
+        return claims;
+    }
+
+    public static List<String> extractAuthorityFromClaims(JWTClaimsSet claimsSet) {
+        Object claimObject = claimsSet.getClaim(GROUPS_CLAIM);
+        if (claimObject == null) {
+          claimObject = claimsSet.getClaim(ROLES_CLAIM);
+        }
+
+        return mapRolesToGrantedAuthorities(getRolesFromClaims(claimObject));
+    }
+
+    @SuppressWarnings("unchecked")
+    private static Collection<String> getRolesFromClaims(Object claims) {
+        return (Collection<String>) claims;
+    }
+
+    private static List<String> mapRolesToGrantedAuthorities(Collection<String> roles) {
+        return roles.stream()
+            .filter(role -> role.startsWith(ROLE_PREFIX))
+            .collect(Collectors.toList());
+    }
+
+    /**
+    * @param providerName The OpenID provider name
+    * @param tokenResponse The token response
+    * @param openIdClaims The OpenID claims
+    * @return The username to set in the {@link UserDetails}
+    */
+    protected String getUsername(String providerName, OpenIdTokenResponse tokenResponse, OpenIdClaims openIdClaims) {
+        return openIdClaims.getPreferredUsername();
+    }
+
+}

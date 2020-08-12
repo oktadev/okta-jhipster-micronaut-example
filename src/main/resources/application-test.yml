@@ -1,0 +1,57 @@
+datasources:
+  default:
+    url: jdbc:h2:mem:space;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    username: space
+    password: ''
+    poolName: Hikari
+    autoCommit: false
+
+liquibase:
+  datasources:
+    default:
+      async: false
+      change-log: classpath:config/liquibase/master.xml
+      contexts: test
+
+jpa:
+  default:
+    packages-to-scan:
+      - org.jhipster.space.domain
+      - org.jhipster.space.repository
+    database-platform: io.github.jhipster.domain.util.FixedH2Dialect
+    properties:
+      hibernate:
+        cache:
+          use_second_level_cache: false
+        id:
+          new_generator_mappings: true
+        jdbc:
+          time_zone: UTC
+        hbm2ddl:
+          auto: none
+
+micronaut:
+  security:
+    enabled: true
+    oauth2:
+      enabled: false
+
+jhipster:
+  clientApp:
+    name: 'spaceApp'
+  logging:
+    # To test json console appender
+    use-json-format: true # By default, logs are in Json format
+    # To test logstash appender
+    logstash:
+      enabled: false
+      host: localhost
+      port: 5000
+      queue-size: 512
+  mail:
+    from: test@localhost
+    base-url: http://127.0.0.1:8080
+  metrics:
+    logs: # Reports metrics in the logs
+      enabled: false
+      report-frequency: 60 # in seconds

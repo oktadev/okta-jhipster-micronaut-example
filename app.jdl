@@ -1,0 +1,40 @@
+application { // <1>
+  config {
+    baseName space
+    applicationType monolith
+    authenticationType oauth2
+    packageName org.jhipster.space
+    prodDatabaseType postgresql
+    testFrameworks [protractor]
+  }
+  entities *
+}
+
+// <2>
+entity SpaceEvent {
+  name String required
+  date LocalDate required
+  description TextBlob required
+  photo ImageBlob required
+  type SpaceEventType required
+}
+
+entity Mission {
+  name String required
+  description String
+}
+
+enum SpaceEventType {
+  LAUNCH,
+  LANDING
+}
+
+// <3>
+relationship OneToOne {
+  SpaceEvent{mission(name)} to Mission
+}
+
+// <4>
+paginate SpaceEvent with infinite-scroll
+paginate Mission with pagination
+

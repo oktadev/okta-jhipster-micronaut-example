@@ -1,0 +1,9 @@
+{
+  "spaceApp": {
+    "SpaceEventType": {
+      "null": "",
+      "LAUNCH": "LAUNCH",
+      "LANDING": "LANDING"
+    }
+  }
+}
