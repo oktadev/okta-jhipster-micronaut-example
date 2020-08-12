@@ -240,7 +240,7 @@ heroku open --remote docker
 
 ⚡️ Find the code on GitHub: https://github.com/oktadeveloper/okta-jhipster-micronaut-example[@oktadeveloper/okta-jhipster-micronaut-example].
 
-<!--
+////
 👀 Read the blog post: https://developer.okta.com/blog/2020/01/13/kotlin-react-crud[Build a CRUD Application with Kotlin and React].
--->
+////
 
