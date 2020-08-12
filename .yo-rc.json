@@ -46,7 +46,13 @@
         "name": "generator-jhipster-micronaut",
         "version": "0.3.8"
       }
-    ]
+    ],
+    "herokuAppName": "micronaut-space",
+    "herokuDeployType": "git",
+    "herokuJavaVersion": "11",
+    "useOkta": true,
+    "oktaAdminLogin": "mraible@gmail.com",
+    "oktaAdminPassword": "Password1"
   },
   "entities": ["SpaceEvent", "Mission"]
 }

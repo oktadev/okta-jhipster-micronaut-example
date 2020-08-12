@@ -1,0 +1,40 @@
+# ===================================================================
+# Micronaut configuration for the "heroku" profile.
+#
+# This configuration overrides the application.yml file.
+# ===================================================================
+
+# ===================================================================
+# Standard Micronaut configuration properties.
+# Full reference is available at:
+# https://docs.micronaut.io/latest/guide/configurationreference.html
+# ===================================================================
+
+micronaut:
+  server:
+    port: ${PORT:8080}
+  security:
+    oauth2:
+      enabled: true
+      clients:
+        oidc:
+          client-secret: ${OKTA_OAUTH2_CLIENT_SECRET_WEB}
+          client-id: ${OKTA_OAUTH2_CLIENT_ID_WEB}
+          openid:
+            issuer: ${OKTA_OAUTH2_ISSUER}
+            end-session:
+              enabled: true
+
+datasources:
+  default:
+    type: com.zaxxer.hikari.HikariDataSource
+    url: ${JDBC_DATABASE_URL}
+    username: ${JDBC_DATABASE_USERNAME}
+    password: ${JDBC_DATABASE_PASSWORD}
+    hikari:
+      maximum-pool-size: 8
+
+liquibase:
+  datasources:
+    default:
+      contexts: prod
