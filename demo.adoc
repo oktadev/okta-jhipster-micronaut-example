@@ -1,0 +1,246 @@
+:experimental:
+// Define unicode for Apple Command key.
+:commandkey: &#8984;
+:toc: macro
+
+== JHipster + Micronaut Demo Steps
+
+Today, I'd like to show you how to use the new and shiny https://github.com/jhipster/generator-jhipster-micronaut[Micronaut Blueprint]. It supports Micronaut 2.0 and deploying to Heroku + adding Okta in one command. I figured it'd make for an excellent demo!
+
+**Prerequisites:**
+
+* https://adoptopenjdk.net/[Java 11]+
+* https://nodejs.org/[Node 12]+
+* https://docs.docker.com/get-docker/[Docker]
+* A https://www.heroku.com/[Heroku Account]
+
+TIP: The brackets at the end of some steps indicate the IntelliJ Live Templates to use. You can find the template definitions at https://github.com/mraible/idea-live-templates[mraible/idea-live-templates].
+
+toc::[]
+
+=== Build a Micronaut App with JHipster
+
+I'll build a simple app that allows you to record space launches and add images to the event. It will look similar to NASA's https://www.nasa.gov/launchschedule/[Launches and Landings].
+
+. Install JHipster and the Micronaut blueprint using npm:
++
+[source,shell]
+----
+npm i -g generator-jhipster@6.10.1 generator-jhipster-micronaut@0.3.8
+----
+
+=== Design a Micronaut Data Model with JHipster's JDL
+
+. Create a directory called `spacefan` and put an `app.jdl` in it.
++
+====
+----
+application { // <1>
+  config {
+    baseName space
+    applicationType monolith
+    authenticationType oauth2
+    packageName org.jhipster.space
+    prodDatabaseType postgresql
+    testFrameworks [protractor]
+  }
+  entities *
+}
+
+// <2>
+entity SpaceEvent {
+  name String required
+  date LocalDate required
+  description TextBlob required
+  photo ImageBlob required
+  type SpaceEventType required
+}
+
+entity Mission {
+  name String required
+  description String
+}
+
+enum SpaceEventType {
+  LAUNCH,
+  LANDING
+}
+
+// <3>
+relationship OneToOne {
+  SpaceEvent{mission(name)} to Mission
+}
+
+// <4>
+paginate SpaceEvent with infinite-scroll
+paginate Mission with pagination
+----
+. The app definition overrides the name, authentication type, production database, and test frameworks.
+. Entity definitions with validation rules.
+. Relationships between entities.
+. Pagination rules can be defined for each entity.
+====
++
+TIP: You can find additional JDL samples on GitHub in the https://github.com/jhipster/jdl-samples[jdl-samples repository].
+
+=== Generate a Micronaut App with Angular
+
+. Open a terminal and run the following command in the `spacefan` directory.
+
+  mhipster import-jdl app.jdl
+
+. Start Keycloak
+
+  docker-compose -f src/main/docker/keycloak.yml up -d
+
+TIP: If you're an Oh My Zsh fan, you can install the https://www.jhipster.tech/oh-my-zsh/[Oh My Zsh JHipster plugin] and just type `jhkeycloakup`.
+
+==== Confirm Authentication with Keycloak Works
+
+. Start the app using Maven:
+
+  ./mvnw
+
+. Go to `http://localhost:8080` and sign in with `admin/admin`.
+
+. Show the **Administration** section and add some entities.
+
+. Mention https://github.com/marak/Faker.js/[Faker.js] and https://www.liquibase.org/[Liquibase] and show how you can turn it off in `src/main/resources/application-dev.yml`.
+
+. Run end-to-end tests to prove everything works.
+
+  npm run e2e
+
+NOTE: The pauses for alerts when running end-to-end tests is a https://github.com/jhipster/generator-jhipster/issues/11766[known issue].
+
+=== Deploy Micronaut to Heroku
+
+. Login to your Heroku account.
+
+  heroku login
+
+. Stop the app and deploy to Heroku.
+
+  mhipster heroku
+
+. Open the app using `heroku open`.
+
+. Login using Okta and change your password.
+
+=== Micronaut + Docker on Heroku
+
+. Use https://github.com/GoogleContainerTools/jib[Jib] to build a Docker image of your app.
+
+  ./mvnw -Pprod verify jib:dockerBuild
+
+. Test it out locally using Docker Compose.
++
+[source,shell]
+----
+docker-compose -f src/main/docker/keycloak.yml down
+docker-compose -f src/main/docker/app.yml up
+----
++
+[CAUTION]
+====
+To make Keycloak work, you need to add the following line to your hosts file (`/etc/hosts` on Mac/Linux, `c:\Windows\System32\Drivers\etc\hosts` on Windows).
+
+```
+127.0.0.1	keycloak
+```
+
+This is because you will access your application with a browser on your machine (which name is localhost, or `127.0.0.1`), but inside Docker it will run in its own container, which name is `keycloak`.
+====
+
+. Create a new app on Heroku, and add it as a remote.
++
+[source,shell]
+----
+heroku apps:create
+git remote add docker https://git.heroku.com/<your-new-app>.git
+----
+
+. Deploy your Micronaut app as a Docker image.
++
+[source,shell]
+----
+heroku container:login
+docker tag space registry.heroku.com/<heroku-app>/web
+docker push registry.heroku.com/<heroku-app>/web
+----
+
+. Use the PostgreSQL and Okta add-ons that are already configured. Run the following command to get the identifiers of the add-ons from the `heroku` remote that you first deployed to.
++
+[source,shell]
+----
+heroku addons --remote heroku
+----
+
+. Then, can attach these instances to your new application.
++
+[source,shell]
+----
+heroku addons:attach <postgresql-addon-name> --remote docker
+heroku addons:attach <okta-addon-name> --remote docker
+----
+
+. Run the following command to get the PostgreSQL URL. It returns a string with the following syntax: `postgres://username:password@address`.
++
+[source,shell]
+----
+heroku config:get DATABASE_URL --remote docker
+----
+
+. Then, set the database environment variables to match the keys that are in `application-heroku.yml`.
++
+[source,shell]
+----
+heroku config:set JDBC_DATABASE_URL=jdbc:postgresql://<address> --remote docker
+heroku config:set JDBC_DATABASE_USERNAME=<username> --remote docker
+heroku config:set JDBC_DATABASE_PASSWORD=<password> --remote docker
+----
+
+. Specify the Micronaut environments and max memory to use.
++
+[source,shell]
+----
+heroku config:set JAVA_OPTS=-Xmx128m --remote docker
+heroku config:set MICRONAUT_ENVIRONMENTS=prod,heroku --remote docker
+hero
+----
+
+. Release the container and start the app.
++
+[source,shell]
+----
+heroku container:release web --remote docker
+----
+
+. Tail the logs to see if the container started successfully.
++
+[source,shell]
+----
+heroku logs --tail --remote docker
+----
+
+. Open the app, click the **sign in** link, and authenticate!
++
+[source,shell]
+----
+heroku open --remote docker
+----
+
+. Test your Dockerized Angular + Micronaut app on https://securityheaders.com[securityheaders.com].
+
+. Add login and logout redirect URIs to your Okta **Web** app and log in.
+
+. Show what happens when you try to login with the super admin that the Okta add-on creates.
+
+== Angular + Micronaut + JHipster is fantastic!
+
+⚡️ Find the code on GitHub: https://github.com/oktadeveloper/okta-jhipster-micronaut-example[@oktadeveloper/okta-jhipster-micronaut-example].
+
+////
+👀 Read the blog post: https://developer.okta.com/blog/2020/01/13/kotlin-react-crud[Build a CRUD Application with Kotlin and React].
+////
+
