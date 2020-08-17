@@ -1,18 +1,19 @@
-# Micronaut + Angular with JHipster 
- 
-This example app shows how to build a basic space launch and landing application with Micronaut, Angular, and JHipster (and Angular 10). Please read [Build a Secure Micronaut and Angular App with JHipster](https://developer.okta.com/blog/2020/08/17/micronaut-jhipster-heroku) to see how to deploy it to Heroku. 
+# Micronaut + Angular with JHipster
 
-**Prerequisites:** 
-* [Node 12](https://nodejs.org/)+
-* [Java 11](https://adoptopenjdk.net/)+
-* [Docker](https://docs.docker.com/get-docker/)
+This example app shows how to build a basic space launch and landing application with Micronaut, Angular, and JHipster (and Angular 10). Please read [Build a Secure Micronaut and Angular App with JHipster](https://developer.okta.com/blog/2020/08/17/micronaut-jhipster-heroku) to see how to deploy it to Heroku.
+
+**Prerequisites:**
+
+- [Node 12](https://nodejs.org/)+
+- [Java 11](https://adoptopenjdk.net/)+
+- [Docker](https://docs.docker.com/get-docker/)
 
 > [Okta](https://developer.okta.com/) has Authentication and User Management APIs that reduce development time with instant-on, scalable user infrastructure. Okta's intuitive API and expert support make it easy for developers to authenticate, manage and secure users and roles in any application.
 
-* [Getting Started](#getting-started)
-* [Links](#links)
-* [Help](#help)
-* [License](#license)
+- [Getting Started](#getting-started)
+- [Links](#links)
+- [Help](#help)
+- [License](#license)
 
 ## Getting Started
 
@@ -43,7 +44,7 @@ Then, start the app.
 ./mvnw
 ```
 
-You'll be able to login with `admin/admin`. 
+You'll be able to login with `admin/admin`.
 
 ### Use Okta for Authentication
 
@@ -79,27 +80,37 @@ Creating Authorization Server claim 'groups':
 Okta application configuration has been written to: /Users/mraible/dev/okta/okta-jhipster-micronaut-example/.okta.env
 ```
 
+The Okta CLI [has not been updated to recognize the Micronaut blueprint](https://github.com/oktadeveloper/okta-cli/issues/29), therefore, you need to edit `.okta.env` and change the property names to the following:
+
+```
+MICRONAUT_SECURITY_OAUTH2_CLIENTS_OIDC_OPENID_ISSUER=https://{yourOktaDomain}/oauth2/default
+MICRONAUT_SECURITY_OAUTH2_CLIENTS_OIDC_CLIENT_ID={yourClientID}
+MICRONAUT_SECURITY_OAUTH2_CLIENTS_OIDC_CLIENT_SECRET={yourClientSecret}
+```
+
 Source the `.okta.env` file to override the default OIDC settings in JHipster, and start your app.
 
 ```
-source .okta.env && ./mvnw`
+source .okta.env && ./mvnw
 ```
 
 Open your browser to <http://localhost:8080>, click **sign in**, and authenticate with Okta!
 
-If you'd like to see how to setup JHipster + Okta without using the Okta CLI, see [the JHipster security documentation](https://www.jhipster.tech/security/#oauth2). 
+If you'd like to see how to setup JHipster + Okta without using the Okta CLI, see [the JHipster security documentation](https://www.jhipster.tech/security/#oauth2).
 
-You can also just use `mhipster heroku` and configure Okta as part of deploying to Heroku. This repo's blog post shows you how to do that. :D
+You can also just use `mhipster heroku` and configure Okta as part of deploying to Heroku. This repo's [blog post](https://developer.okta.com/blog/2020/08/17/micronaut-jhipster-heroku) shows you how to do that.
 
 ## Links
 
 This example uses the following open source libraries, which is sponsored by Okta:
 
-* [JHipster](https://jhipster.tech)
+- [Angular](https://angular.io)
+- [JHipster](https://jhipster.tech)
+- [Micronaut](https://micronaut.io)
 
 ## Help
 
-Please post any questions as comments on the [blog post](https://developer.okta.com/blog/2020/08/17/micronaut-jhipster-heroku), or visit our [Okta Developer Forums](https://devforum.okta.com/).
+Please post any questions as comments on the [blog post](https://developer.okta.com/blog/2020/08/17/micronaut-jhipster-heroku), or visit our [Okta Developer Forums](https://devforum.okta.com/). You can also ask them on [Stack Overflow with the `jhipster` tag](https://stackoverflow.com/tags/jhipster).
 
 ## License
 
