@@ -29,7 +29,7 @@ You can also create it by installing Micronaut for JHipster, JHipster, and impor
 ```
 npm i -g generator-jhipster generator-jhipster-micronaut
 mkdir spacefan && cd spacefan
-jhipster import-jdl space
+jhipster jdl space
 ```
 
 Start Keycloak in a Docker container:
