@@ -206,7 +206,7 @@ heroku config:set JDBC_DATABASE_PASSWORD=<password> --remote docker
 ----
 heroku config:set JAVA_OPTS=-Xmx128m --remote docker
 heroku config:set MICRONAUT_ENVIRONMENTS=prod,heroku --remote docker
-hero
+heroku config:set MICRONAUT_ENV_DEDUCTION=false --remote docker
 ----
 
 . Release the container and start the app.
