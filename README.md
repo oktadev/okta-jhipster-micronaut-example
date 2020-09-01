@@ -102,7 +102,7 @@ You can also just use `mhipster heroku` and configure Okta as part of deploying 
 
 ## Links
 
-This example uses the following open source libraries, which is sponsored by Okta:
+This example uses the following open source libraries:
 
 - [Angular](https://angular.io)
 - [JHipster](https://jhipster.tech)
