@@ -238,9 +238,7 @@ heroku open --remote docker
 
 == Angular + Micronaut + JHipster is fantastic!
 
-⚡️ Find the code on GitHub: https://github.com/oktadeveloper/okta-jhipster-micronaut-example[@oktadeveloper/okta-jhipster-micronaut-example].
+🚀 Find the code on GitHub: https://github.com/oktadeveloper/okta-jhipster-micronaut-example[@oktadeveloper/okta-jhipster-micronaut-example].
 
-////
-👀 Read the blog post: https://developer.okta.com/blog/2020/01/13/kotlin-react-crud[Build a CRUD Application with Kotlin and React].
-////
+👀 Read the blog post: https://developer.okta.com/blog/2020/08/17/micronaut-jhipster-heroku[Build a Secure Micronaut and Angular App with JHipster].
 
