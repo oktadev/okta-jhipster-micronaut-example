@@ -48,7 +48,7 @@ You'll be able to login with `admin/admin`.
 
 ### Use Okta for Authentication
 
-If you'd like to use Okta instead of Keycloak, you'll need to change a few things. First, install the [Okta CLI](https://github.com/oktadeveloper/okta-cli) and run `okta register` to create an account.
+If you'd like to use Okta instead of Keycloak, you'll need to change a few things. First, install the [Okta CLI](https://github.com/okta/okta-cli) and run `okta register` to create an account.
 
 Once you've verified your account, run `okta apps create`. Select **Web** > **JHipster**, and the pre-selected Redirect URI. You should see output like the following:
 
